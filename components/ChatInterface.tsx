@@ -4,14 +4,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Message, ToolCall } from '@/lib/types';
-import { Code, ArrowUp, Loader2, Home as HomeIcon } from 'lucide-react'; // Import HomeIcon
+import { Code, ArrowUp, Loader2, Home as HomeIcon } from 'lucide-react';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown, { Components } from 'react-markdown';
-import remarkGfm from 'remark-gfm'; // Importar remark-gfm
-import rehypeHighlight from 'rehype-highlight'; // Importar rehype-highlight
-import Link from 'next/link'; // Import Link
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import Link from 'next/link';
+
+// Componente para os pontos animados
+const AnimatedDots = () => (
+  <span className="inline-flex items-center">
+    <span className="animate-bounce delay-0">.</span>
+    <span className="animate-bounce delay-150">.</span>
+    <span className="animate-bounce delay-300">.</span>
+  </span>
+);
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -164,13 +173,17 @@ export default function ChatInterface({
                 )}
                 <div className="space-y-1">
                   <div className="text-sm whitespace-pre-wrap prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-headings:my-2 prose-blockquote:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-table:my-2 prose-th:px-3 prose-th:py-1 prose-td:px-3 prose-td:py-1">
-                  <ReactMarkdown 
-                    remarkPlugins={[remarkGfm]} 
-                    rehypePlugins={[rehypeHighlight]}
-                    components={markdownComponents} // Pass custom components
-                  >
-                    {message.content.toString()}
-                  </ReactMarkdown>
+                  {message.content === '...' ? (
+                    <AnimatedDots />
+                  ) : (
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]} 
+                      rehypePlugins={[rehypeHighlight]}
+                      components={markdownComponents}
+                    >
+                      {message.content.toString()}
+                    </ReactMarkdown>
+                  )}
                   </div>
                   <p className="text-xs text-muted-foreground">{formatTime(message.created_at)}</p>
                 </div>
