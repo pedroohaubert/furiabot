@@ -16,16 +16,17 @@ import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import Image from "next/image";
 
+// Componente de página de login. Permite ao usuário autenticar-se.
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { login, isLoading } = useAuth();
 
+  // Handler para processar o login. Recebe o evento do formulário.
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
-
     try {
       await login(username, password);
     } catch (err: any) {
@@ -91,4 +92,4 @@ export default function LoginPage() {
       </Card>
     </div>
   );
-} 
+}

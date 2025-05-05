@@ -6,16 +6,17 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
+// Componente principal da página inicial. Exibe informações de autenticação e navegação.
 export default function Home() {
-  const { isAuthenticated, user, isLoading, logout } = useAuth(); // Import logout
+  const { isAuthenticated, user, isLoading, logout } = useAuth();
   const [mounted, setMounted] = useState(false);
 
-  // Este efeito garante que a hidratação esteja completa antes de renderizar conteúdo dependente de autenticação
+  // Efeito para garantir hidratação antes de renderizar conteúdo dependente de autenticação.
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Não mostra conteúdo dependente de autenticação até a hidratação estar completa
+  // Não mostra conteúdo dependente de autenticação até a hidratação estar completa.
   if (!mounted) {
     return null;
   }
@@ -31,9 +32,7 @@ export default function Home() {
             height={38}
             priority
           />
-          
           <h1 className="text-3xl font-bold">Bem-vindo ao <br /> FuriaBotSuperFã3000</h1>
-          
           {isLoading ? (
             <p>Carregando...</p>
           ) : isAuthenticated ? (
@@ -45,8 +44,7 @@ export default function Home() {
                 <Button asChild>
                   <Link href="/chat">Começar a conversar</Link>
                 </Button>
-                {/* Add Logout Button */}
-                <Button variant="outline" onClick={logout}> 
+                <Button variant="outline" onClick={logout}>
                   Sair
                 </Button>
               </div>
@@ -66,7 +64,6 @@ export default function Home() {
           )}
         </div>
       </main>
-
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center text-sm text-gray-500">
         <p>© 2025 Furia Bot. Todos os direitos reservados.</p>
       </footer>

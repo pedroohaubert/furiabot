@@ -3,8 +3,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
+// Use NEXT_PUBLIC_API_URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 type User = {
   username: string;
   // Add other user fields if needed
@@ -70,6 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     formData.append('password', password);
 
     try {
+      // Use the API_URL constant derived from NEXT_PUBLIC_API_URL
       const response = await fetch(`${API_URL}/token`, {
         method: 'POST',
         headers: {
@@ -105,6 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
+      // Use the API_URL constant derived from NEXT_PUBLIC_API_URL
       const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: {
@@ -180,6 +182,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!currentRefreshToken) return false;
     
     try {
+      // Use the API_URL constant derived from NEXT_PUBLIC_API_URL
       const response = await fetch(`${API_URL}/refresh-token`, {
         method: 'POST',
         headers: {
@@ -217,4 +220,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {isLoading ? null : children}
     </AuthContext.Provider>
   );
-}; 
+};

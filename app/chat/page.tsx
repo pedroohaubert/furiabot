@@ -7,6 +7,7 @@ import ChatInterface from "@/components/ChatInterface";
 import { formatConversationList, extractMessages, extractToolCalls, findSessionById } from "@/lib/conversation-utils";
 import { SessionData, Message, ToolCall, ConversationListItem } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Função auxiliar para parsear tool calls do stream
 const parseToolCall = (content: string): string | null => {
@@ -28,7 +29,8 @@ export default function Dashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [toolCalls, setToolCalls] = useState<ToolCall[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [isCreatingNewConversation, setIsCreatingNewConversation] = useState(false); // Novo estado
+  const [isCreatingNewConversation, setIsCreatingNewConversation] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   // Ref para armazenar temporariamente o ID de nova sessão vindo do stream
   const newSessionIdRef = useRef<string | null>(null);
   // Armazena temporariamente o ID de nova sessão até buscarmos dados
@@ -42,7 +44,8 @@ export default function Dashboard() {
     setError(null);
 
     try {
-      const response = await fetchWithAuth('http://localhost:8000/sessions');
+      // Use NEXT_PUBLIC_API_URL
+      const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/sessions`);
 
       if (!response.ok) {
         throw new Error(`Falha ao buscar dados: ${response.status} ${response.statusText}`);
@@ -65,7 +68,7 @@ export default function Dashboard() {
     fetchConversationData();
     // Inicia uma nova conversa por padrão ao carregar a página
     handleNewConversation();
-    // Auto-refresh data every 60 segundos
+    // Auto-refresh data every 60 seconds
     const refreshInterval = setInterval(() => fetchConversationData(false), 60000);
     return () => clearInterval(refreshInterval);
   }, [fetchConversationData]); // Adicionado fetchConversationData como dependência
@@ -187,7 +190,8 @@ export default function Dashboard() {
         ? { message: content } // Não envia session_id para nova conversa
         : { message: content, session_id: activeSessionId };
 
-      const response = await fetchWithAuth('http://localhost:8000/stream_response', {
+      // Use NEXT_PUBLIC_API_URL
+      const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/stream_response`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
@@ -376,22 +380,47 @@ export default function Dashboard() {
     );
   }
 
+  // Funções para controlar a visibilidade da barra lateral
+  const toggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible);
+  };
+
+  const closeSidebar = () => {
+    setSidebarVisible(false);
+  };
+
   return (
-    <div className="flex h-screen bg-background">
+    <div className="relative flex h-screen bg-background overflow-hidden">
+      {/* Overlay para fechar a barra lateral em dispositivos móveis */}
+      {sidebarVisible && (
+        <div 
+          className="fixed inset-0 bg-black/20 z-10 md:hidden" 
+          onClick={closeSidebar}
+        />
+      )}
+      
       <ConversationSidebar
         conversations={conversations}
         activeSessionId={activeSessionId}
-        onSessionSelect={handleSessionSelect} // Passa a função correta
-        onNewConversation={handleNewConversation} // Passa a nova função
+        onSessionSelect={handleSessionSelect}
+        onNewConversation={handleNewConversation}
+        visible={sidebarVisible}
+        onClose={closeSidebar}
       />
-      <main className="flex-1 flex flex-col">
-        {/* Sempre mostramos o ChatInterface agora */}
+      
+      {/* Apply conditional padding/margin based on sidebar visibility */}
+      <main className={cn(
+        "flex-1 flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-out"
+      )}>
         <ChatInterface
           messages={messages}
           toolCalls={toolCalls}
-          sessionId={activeSessionId} // Passa o ID ativo (pode ser null inicialmente na criação)
+          sessionId={activeSessionId}
           onSendMessage={sendMessage}
           isStreaming={isStreaming}
+          sidebarVisible={sidebarVisible}
+          onToggleSidebar={toggleSidebar}
+          onNewConversation={handleNewConversation} // Pass handleNewConversation
         />
       </main>
     </div>

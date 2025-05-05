@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Message {
   content: string;
   role: string;
@@ -80,4 +79,4 @@ export interface ToolCall {
   parameters?: any;
   status: "running" | "completed"; // status é obrigatório
   result?: any;
-} 
+}
