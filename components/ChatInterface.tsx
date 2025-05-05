@@ -12,7 +12,6 @@ import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 
 // Componente para os pontos animados
 const AnimatedDots = () => (
@@ -38,7 +37,6 @@ interface ChatInterfaceProps {
 export default function ChatInterface({
   messages,
   toolCalls,
-  sessionId,
   onSendMessage,
   isStreaming,
   sidebarVisible,
@@ -69,6 +67,7 @@ export default function ChatInterface({
     try {
       await onSendMessage(content);
     } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
       setDraft(content);
     }
   };

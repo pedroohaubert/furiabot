@@ -9,6 +9,11 @@ import { SessionData, Message, ToolCall, ConversationListItem } from "@/lib/type
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+if (!API_URL) {
+  throw new Error("NEXT_PUBLIC_API_URL is not defined. Please set it in your environment variables.");
+}
+
 // Função auxiliar para parsear tool calls do stream
 const parseToolCall = (content: string): string | null => {
   const match = content.match(/^([a-zA-Z0-9_]+)\(.*\)$/);
@@ -45,7 +50,7 @@ export default function Dashboard() {
 
     try {
       // Use NEXT_PUBLIC_API_URL
-      const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/sessions`);
+      const response = await fetchWithAuth(`${API_URL}/sessions`);
 
       if (!response.ok) {
         throw new Error(`Falha ao buscar dados: ${response.status} ${response.statusText}`);
@@ -191,7 +196,7 @@ export default function Dashboard() {
         : { message: content, session_id: activeSessionId };
 
       // Use NEXT_PUBLIC_API_URL
-      const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/stream_response`, {
+      const response = await fetchWithAuth(`${API_URL}/stream_response`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
